@@ -8,9 +8,13 @@
 ​		Kettle中有两种脚本文件，transformation和job，transformation完成针对数据的基础转换，job则完成整个工作流的控制。
 ​		Kettle(现在已经更名为PDI，Pentaho Data Integration-Pentaho数据集成)。
 
+​		中文官网：http://www.kettle.org.cn/  
+
 ## 2、安装
 
-1、下载网址：https://community.hitachivantara.com/docs/DOC-1009855
+1、下载网址：https://sourceforge.net/projects/pentaho/files/
+
+![image-20220609163857933](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220609163857933.png)
 
 2、直接解压到指定目录即可
 
