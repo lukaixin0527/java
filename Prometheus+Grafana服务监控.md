@@ -535,6 +535,11 @@ quantile 用于计算当前样本数据值的分布情况 quantile(φ, express)�
 ```
 wget https://dl.grafana.com/enterprise/release/grafana-enterprise-8.5.5-1.x86_64.rpmsudo 
 yum install grafana-enterprise-8.5.5-1.x86_64.rpm
+
+推荐使用安装压缩包,下载到opt目录下
+wget https://dl.grafana.com/enterprise/release/grafana-enterprise-9.0.0.linux-amd64.tar.gz
+tar -zxvf grafana -enterprise-9.0.0.linux-amd64.tar.gz
+
 ```
 
 ### 2、启动服务使用 
@@ -544,6 +549,7 @@ systemd 启动服务器
 sudo systemctl daemon-reload   
 sudo systemctl start grafana-server   
 sudo systemctl status grafana-server
+service grafana-server stop
 
 后台启动
 nohup ./bin/grafana-server web > ./grafana.log 2>&1 &
@@ -594,6 +600,29 @@ Grafana 中所有的Dashboard 通过 JSON 进行共享，下载并且导入这�
 ![image-20220616222619951](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220616222619951.png)
 
 ![image-20220616222803123](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220616222803123.png)
+
+### 6、配置免密登录
+
+```
+首先grafana默认需要登录才可使用，初始用户名和密码为admin/admin.
+grafana也提供了匿名登录，即无须登录即可进入grafana面板，编辑conf目录下的default.ini文件就可以做到。
+
+默认目录/var/share/garafana/conf下面，开启免密登入，enabled改成true
+```
+
+```
+ [auth.anonymous]
+ 
+ # enable anonymous access
+ 
+enabled = true         #默认false
+ 
+# specify role for unauthenticated users
+ 
+org_role = Viewer    #默认Viewer
+```
+
+
 
 # 七、实战
 
@@ -690,3 +719,57 @@ PUBLIC_PORT：暴露端口
 ![image-20220617104125774](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220617104125774.png)
 
 ![image-20220617104148302](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220617104148302.png)
+
+## 2、监控liunx服务器
+
+下载模板
+
+![image-20220617105854848](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220617105854848.png)
+
+## 3、监控mysql服务
+
+1、mysqld_exporter下载 https://prometheus.io/download/
+
+![image-20220617113926523](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220617113926523.png)
+
+```
+1、上传 mysqld_exporter-0.14.0.linux-amd64.tar.gz
+2、tar  -zxvf  mysqld_exporter-0.14.0.linux-amd64.tar.gz -C /opt/module
+3、当前目录下新建配置文件 my.cnf
+```
+
+2、修改 my.cnf配置mysql信息
+
+```
+[client]
+host=127.0.0.1
+user= root
+password=root
+```
+
+3、启动服务
+
+```
+nohup ./mysqld_exporter --config.my-cnf=/opt/system_detection/mysqld_exporter-0.14.0.linux-amd64/my.cnf >mysqld_exporter.log 2>&1 &
+```
+
+访问：http://127.0.0.1:9104/metrics 查看
+
+4、修改prometheus组件的prometheus.yml加入mysql节点：
+
+```
+# 添加 mysql_export 监控配置
+  - job_name: 'mysql_export'
+    scrape_interval: 60s
+    scrape_timeout: 60s
+    static_configs:
+    - targets: ['127.0.0.1:9104']
+```
+
+5、下载模板
+
+![image-20220617114409963](https://raw.githubusercontent.com/lukaixin0527/images/master/java-img/image-20220617114409963.png)
+
+## 4、监控springboot服务
+
+https://blog.csdn.net/qq_38225558/article/details/117696800
